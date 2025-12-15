@@ -22,7 +22,7 @@ const CreatePost = () => {
 
   const [currentTag, setCurrentTag] = useState("");
 
-  // Sample games data
+//sample
   const popularGames = [
     "Valorant",
     "Apex Legends",
