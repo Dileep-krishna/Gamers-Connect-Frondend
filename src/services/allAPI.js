@@ -17,6 +17,16 @@ export const postCreateAPI = async (reqBody, reqHeader) => {
 };
 
 // ✅ get all posts
-export const getAllPostsAPI = async (reqHeader) => {
-  return await commonAPI("GET", `${SERVERURL}/posts`, "", reqHeader);
+export const getAllPostsAPI = async () => {
+  const token = sessionStorage.getItem("token");
+
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/home-post`,
+    null,
+    {
+      Authorization: `Bearer ${token}`
+    }
+  );
 };
+
