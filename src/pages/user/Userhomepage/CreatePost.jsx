@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SERVERURL from "../../../services/serverURL";
-import { postCreateAPI } from "../../../services/allAPI";
+import { getUserProfileAPI, postCreateAPI } from "../../../services/allAPI";
  // Change this to your backend URL
 
 const CreatePost = () => {
@@ -141,6 +141,29 @@ const handleSubmit = async () => {
       handleAddTag();
     }
   };
+  const [user, setUser] = useState(null);
+  
+    useEffect(() => {
+      fetchUserProfile();
+    }, []);
+  
+    const fetchUserProfile = async () => {
+      try {
+        const result = await getUserProfileAPI();
+  
+        if (result.success) {
+          setUser(result.user);
+  
+          // 🔹 OPTIONAL: keep updated user in sessionStorage
+          sessionStorage.setItem(
+            "existingUser",
+            JSON.stringify(result.user)
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white relative">
@@ -202,15 +225,19 @@ const handleSubmit = async () => {
             <div className="p-6 space-y-6">
               {/* User Info */}
               <div className="flex items-center gap-4">
-                <div 
-                  className="bg-cover rounded-full size-12 border-2 border-purple-500"
-                  style={{ 
-                    backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCMrjMtDQj-lANYcOPYEzZbmhLxNdrUCzNoHK_7G_ZLF8GUqktcYql1Al9_2jsclYlNQ8pWH0vT9rH1_tKKM6d4SX6_nfcFsA7LXpUPHXdbYAKw06WhzZ4dKct6XJVg3l1G_orHzx5DK0ik_R9LCagIq2qKErc2K708MTlNwJ_cDb6LZHWcnmDNehhg1x__mmSNYombHkmkgm-Jwi_HPpeFjaAdYyDf4Z3IX0LP2HBp1VVAIpW05IkoYtg1d0jGTJkKrTVlUlUe_5OH")' 
-                  }}
-                />
+                    <div
+              className="bg-cover bg-center rounded-full w-10 h-10 border-2 border-purple-500 cursor-pointer"
+              style={{
+                backgroundImage: user?.profile
+                  ? `url(${SERVERURL}/imguploads/${user.profile})`
+                  : `url(https://i.pravatar.cc/150)`
+              }}
+              onClick={() => navigate('/user-profile')}
+              title="User Profile"
+            />
                 <div>
-                  <p className="font-bold text-white">GamerUsername</p>
-                  <p className="text-gray-400 text-sm">Level 12 Pro Player</p>
+                  <p className="font-bold text-white"> {user?.username}</p>
+                  <p className="text-gray-400 text-sm"> {user?.bio}</p>
                 </div>
               </div>
 

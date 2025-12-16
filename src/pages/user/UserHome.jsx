@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Notifications from './Userhomepage/Notifications';
-import { getAllPostsAPI } from '../../services/allAPI';
+import { getAllPostsAPI, getUserProfileAPI } from '../../services/allAPI';
 import SERVERURL from '../../services/serverURL';
 
 
@@ -54,7 +54,7 @@ const UserHome = () => {
     { icon: 'trophy', label: 'Tournaments', path: '/tournaments' },
     { icon: 'groups', label: 'Groups', path: '/groups' },
     { icon: 'group', label: 'Friends', path: '/friends' },
-    { icon: 'bookmark', label: 'Saved Posts', path: '/saved' },
+
     { icon: 'settings', label: 'Settings', path: '/settings' },
     { icon: 'help', label: 'Help & Support', path: '/help' },
     { icon: 'logout', label: 'Logout', path: '/logout' }
@@ -63,7 +63,40 @@ const UserHome = () => {
   // Dummy user avatar URL (replace with dynamic source)
   const userAvatarURL = 'https://i.pravatar.cc/150?img=10';
 
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const result = await getUserProfileAPI();
+
+      if (result.success) {
+        setUser(result.user);
+
+        // 🔹 OPTIONAL: keep updated user in sessionStorage
+        sessionStorage.setItem(
+          "existingUser",
+          JSON.stringify(result.user)
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
+        Loading profile...
+      </div>
+    );
+  }
+
+
   return (
+
     <div className="min-h-screen bg-gray-900 text-white relative">
       {/* Material Symbols stylesheet */}
       <link
@@ -127,11 +160,17 @@ const UserHome = () => {
 
             {/* User avatar */}
             <div
-              className="ml-2 bg-cover rounded-full w-10 h-10 border-2 border-purple-500 cursor-pointer"
-              style={{ backgroundImage: `url(${userAvatarURL})` }}
+              className="bg-cover bg-center rounded-full w-10 h-10 border-2 border-purple-500 cursor-pointer"
+              style={{
+                backgroundImage: user?.profile
+                  ? `url(${SERVERURL}/imguploads/${user.profile})`
+                  : `url(https://i.pravatar.cc/150)`
+              }}
               onClick={() => navigate('/user-profile')}
               title="User Profile"
             />
+
+
           </div>
         </header>
 
@@ -155,25 +194,38 @@ const UserHome = () => {
             <aside className="col-span-12 lg:col-span-3">
               <div className="flex flex-col rounded-xl bg-gray-800/80 backdrop-blur-sm p-4 space-y-6 sticky top-20 h-fit">
                 <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-5">
                     <div
-                      className="bg-cover rounded-full w-16 h-16"
-                      style={{ backgroundImage: `url(${userAvatarURL})` }}
-                      title="User Avatar"
+                      className="bg-cover bg-center rounded-full w-10 h-10 border-2 border-purple-500 cursor-pointer"
+                      style={{
+                        backgroundImage: user?.profile
+                          ? `url(${SERVERURL}/imguploads/${user.profile})`
+                          : `url(https://i.pravatar.cc/150)`
+                      }}
+                      onClick={() => navigate('/user-profile')}
+                      title="User Profile"
                     />
+
+
                     <div className="flex flex-col">
-                      <h1 className="text-white text-lg font-bold">GamerUsername</h1>
-                      <p className="text-gray-400 text-sm">Level 12</p>
+                      <h1 className="text-white text-lg font-bold">
+                        {user?.username}
+                      </h1>
+
+                      <p className="text-gray-400 mt-1">
+                        {user?.bio || "No bio added"}
+                      </p>
+
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  {/* <div className="flex flex-col gap-2">
                     <p className="text-white text-sm font-medium">XP</p>
                     <div className="rounded-full bg-gray-700 h-2">
                       <div className="h-full rounded-full bg-purple-500" style={{ width: '75%' }} />
                     </div>
                     <p className="text-gray-400 text-xs">3,450 / 5,000 XP</p>
-                  </div>
+                  </div> */}
 
                   {/* Navigation Menu */}
                   <nav className="flex flex-col gap-2 pt-2">
@@ -204,10 +256,17 @@ const UserHome = () => {
                   <div className="flex w-full items-stretch rounded-lg">
                     <div className="flex justify-end pt-3 pr-2">
                       <div
-                        className="bg-cover rounded-full w-10 h-10"
-                        style={{ backgroundImage: `url(${userAvatarURL})` }}
-                        title="User Avatar"
+                        className="bg-cover bg-center rounded-full w-10 h-10 border-2 border-purple-500 cursor-pointer"
+                        style={{
+                          backgroundImage: user?.profile
+                            ? `url(${SERVERURL}/imguploads/${user.profile})`
+                            : `url(https://i.pravatar.cc/150)`
+                        }}
+                        onClick={() => navigate('/user-profile')}
+                        title="User Profile"
                       />
+
+
                     </div>
                     <div className="flex flex-1 flex-col">
                       <textarea
@@ -219,15 +278,17 @@ const UserHome = () => {
                       />
                       <div className="flex border border-gray-600 bg-gray-700/50 justify-between items-center pr-4 rounded-b-lg border-t-0 pl-4 py-2">
                         <div className="flex items-center gap-1">
-                          <button className="flex items-center justify-center p-1.5 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
-                            <span className="material-symbols-outlined text-xl">image</span>
-                          </button>
-                          <button className="flex items-center justify-center p-1.5 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
-                            <span className="material-symbols-outlined text-xl">videocam</span>
-                          </button>
-                          <button className="flex items-center justify-center p-1.5 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
-                            <span className="material-symbols-outlined text-xl">sell</span>
-                          </button>
+                          <Link to={"/create-post"}>
+                            <button className="flex items-center justify-center p-1.5 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                              <span className="material-symbols-outlined text-xl">image</span>
+                            </button>
+                          </Link>
+                          <Link to={"/create-post"}>
+                            <button className="flex items-center justify-center p-1.5 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+                              <span className="material-symbols-outlined text-xl">videocam</span>
+                            </button>
+                          </Link>
+
                         </div>
                         <button
                           onClick={() => navigate('/create-post')}
@@ -244,7 +305,7 @@ const UserHome = () => {
               {/* Tabs */}
               <div className="pb-3 sticky top-40 bg-gray-900/80 backdrop-blur-sm z-10 mb-6">
                 <div className="flex border-b border-white/10 gap-8 overflow-x-auto">
-                  {['following', 'trending', 'newest'].map((tab) => (
+                  {['Gaming Reels'].map((tab) => (
                     <button
                       key={tab}
                       className={`pb-3 pt-2 whitespace-nowrap border-b-2 transition-colors ${tab === 'following'

@@ -30,3 +30,33 @@ export const getAllPostsAPI = async () => {
   );
 };
 
+// update user profile
+export const updateUserProfileAPI = async (reqBody) => {
+  const token = sessionStorage.getItem("token");
+
+  return await commonAPI(
+    "PUT",
+    `${SERVERURL}/profile-update`,
+    reqBody,
+    {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${token}`
+    }
+  );
+};
+// get user profile
+export const getUserProfileAPI = async () => {
+  const token = sessionStorage.getItem("token");
+
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/profile`,
+    null,
+    {
+      Authorization: `Bearer ${token}`
+    }
+  );
+};
+
+
+
