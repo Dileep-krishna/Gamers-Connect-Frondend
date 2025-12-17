@@ -66,6 +66,24 @@ export const adminUsersAPI=async()=>{
   return await commonAPI("GET",`${SERVERURL}/get-allUsers`)
 }
 
+
+//admin profile edit
+
+export const updateAdminProfileAPI = async (reqBody) => {
+  const token = sessionStorage.getItem("token"); // admin token
+
+  return await commonAPI(
+    "PUT",
+    `${SERVERURL}/admin/profile`,
+    reqBody,
+    {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${token}`
+    }
+  );
+};
+
+
 // user delete api
 
 export const deleteUserAPI = async (id) => {
