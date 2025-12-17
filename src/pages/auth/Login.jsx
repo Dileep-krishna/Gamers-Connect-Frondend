@@ -12,7 +12,7 @@ const Login = () => {
   });
 
   const handLogin = async (e) => {
-    e.preventDefault(); // 🔴 STOP PAGE REFRESH
+    e.preventDefault();
 
     const { email, password } = login;
 
@@ -36,7 +36,14 @@ const Login = () => {
         toast.success("Login successful");
 
         setLogin({ email: "", password: "" });
-        navigate("/userhome");
+
+        // 🔥 FRONTEND ADMIN CHECK
+        if (email === "admin@gmail.com" && password === "admin") {
+          navigate("/admin");        // 👑 ADMIN PAGE
+        } else {
+          navigate("/userhome");     // 👤 USER PAGE
+        }
+
       } else {
         toast.error(result.message || "Invalid email or password");
       }
@@ -66,10 +73,8 @@ const Login = () => {
           Welcome back! Please log in to continue.
         </p>
 
-        {/* 🔴 FORM */}
         <form className="space-y-6" onSubmit={handLogin}>
 
-          {/* Email */}
           <input
             type="email"
             placeholder="Enter your email"
@@ -78,7 +83,6 @@ const Login = () => {
             className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-2xl text-white"
           />
 
-          {/* Password */}
           <input
             type="password"
             placeholder="Enter your password"
@@ -87,7 +91,6 @@ const Login = () => {
             className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-2xl text-white"
           />
 
-          {/* Login Button */}
           <button
             type="submit"
             className="w-full py-3 rounded-2xl text-white font-semibold bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-105"

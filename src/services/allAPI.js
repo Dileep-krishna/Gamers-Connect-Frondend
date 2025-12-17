@@ -1,3 +1,5 @@
+
+import axios from "axios";
 import commonAPI from "./commonAPI";
 import SERVERURL from "./serverURL";
 
@@ -57,6 +59,24 @@ export const getUserProfileAPI = async () => {
     }
   );
 };
+// ---------admin---------------------
+
+//get all users in admin
+export const adminUsersAPI=async()=>{
+  return await commonAPI("GET",`${SERVERURL}/get-allUsers`)
+}
+
+// user delete api
+
+export const deleteUserAPI = async (id) => {
+  const response = await axios.delete(
+    `${SERVERURL}/admin/delete-user/${id}`
+  );
+  return response.data;
+};
+
+
+
 
 
 
