@@ -62,9 +62,19 @@ export const getUserProfileAPI = async () => {
 // ---------admin---------------------
 
 //get all users in admin
-export const adminUsersAPI=async()=>{
-  return await commonAPI("GET",`${SERVERURL}/get-allUsers`)
-}
+export const adminUsersAPI = async () => {
+  const token = sessionStorage.getItem("token"); // admin token
+
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/get-allUsers`,
+    null,
+    {
+      Authorization: `Bearer ${token}`,
+    }
+  );
+};
+
 
 
 //admin profile edit
@@ -86,12 +96,22 @@ export const updateAdminProfileAPI = async (reqBody) => {
 
 // user delete api
 
+
 export const deleteUserAPI = async (id) => {
+  const token = sessionStorage.getItem("token"); // admin token
+
   const response = await axios.delete(
-    `${SERVERURL}/admin/delete-user/${id}`
+    `${SERVERURL}/delete-user/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
+
   return response.data;
 };
+
 
 
 

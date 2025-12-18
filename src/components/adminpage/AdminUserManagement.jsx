@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";            // <-- Import SweetAlert2
 import { adminUsersAPI, deleteUserAPI } from "../../services/allAPI";
 import SERVERURL from "../../services/serverURL";
 
@@ -11,7 +12,6 @@ const AdminUserManagement = () => {
       const result = await adminUsersAPI();
 
       if (Array.isArray(result)) {
-        // ❌ remove admin
         const filteredUsers = result.filter(
           (user) => user.email !== "admin@gmail.com"
         );
@@ -22,19 +22,37 @@ const AdminUserManagement = () => {
     }
   };
 
-  // 🗑 Delete user
+  // 🗑 Delete user with SweetAlert2 confirmation
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this user?");
-    if (!confirmDelete) return;
+    // Show SweetAlert confirmation dialog
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to delete this user? This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete!",
+      cancelButtonText: "Cancel",
+    });
 
-    try {
-      const result = await deleteUserAPI(id);
-      if (result?.success) {
-        alert("User deleted successfully");
-        getAllUsers();
+    if (result.isConfirmed) {
+      try {
+        const response = await deleteUserAPI(id);
+
+        if (response?.success) {
+          // Update state to remove deleted user
+          setAllUsers((prev) => prev.filter((user) => user._id !== id));
+
+          // Show success message
+          Swal.fire("Deleted!", "User has been deleted.", "success");
+        } else {
+          Swal.fire("Error", "Failed to delete user.", "error");
+        }
+      } catch (error) {
+        console.log(error);
+        Swal.fire("Error", "An error occurred.", "error");
       }
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -42,7 +60,6 @@ const AdminUserManagement = () => {
     getAllUsers();
   }, []);
 
-  // 🔍 Search
   const searchedUsers = allUsers.filter(
     (user) =>
       user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -83,7 +100,7 @@ const AdminUserManagement = () => {
                 <img
                   src={
                     user.profile
-                      ? `${SERVERURL}/uploads/${user.profile}`
+                      ? `${SERVERURL}/imguploads/${user.profile}`
                       : "https://cdn-icons-png.flaticon.com/512/149/149071.png"
                   }
                   alt="profile"
@@ -93,14 +110,10 @@ const AdminUserManagement = () => {
               </div>
 
               {/* Email */}
-              <div className="col-span-4 text-gray-300">
-                {user.email}
-              </div>
+              <div className="col-span-4 text-gray-300">{user.email}</div>
 
               {/* Status */}
-              <div className="col-span-2 text-green-400">
-                Active
-              </div>
+              <div className="col-span-2 text-green-400">Active</div>
 
               {/* Delete */}
               <div className="col-span-2">
@@ -114,15 +127,11 @@ const AdminUserManagement = () => {
             </div>
           ))
         ) : (
-          <p className="text-center p-6 text-gray-400">
-            No users found
-          </p>
+          <p className="text-center p-6 text-gray-400">No users found</p>
         )}
       </div>
 
-      <p className="mt-4 text-gray-400">
-        Total Users: {searchedUsers.length}
-      </p>
+      <p className="mt-4 text-gray-400">Total Users: {searchedUsers.length}</p>
     </div>
   );
 };
