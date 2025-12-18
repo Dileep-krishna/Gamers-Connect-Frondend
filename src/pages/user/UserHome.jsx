@@ -51,9 +51,7 @@ const UserHome = () => {
     { icon: 'home', label: 'Home', path: '/userhome' },
     { icon: 'newspaper', label: 'My Feed', path: '/myfeed' },
     { icon: 'explore', label: 'Explore', path: '/explore' },
-    { icon: 'trophy', label: 'Tournaments', path: '/tournaments' },
-    { icon: 'groups', label: 'Groups', path: '/groups' },
-    { icon: 'group', label: 'Friends', path: '/friends' },
+
 
     { icon: 'settings', label: 'Settings', path: '/settings' },
     { icon: 'help', label: 'Help & Support', path: '/help' },

@@ -22,39 +22,41 @@ const AdminUserManagement = () => {
     }
   };
 
-  // 🗑 Delete user with SweetAlert2 confirmation
-  const handleDelete = async (id) => {
-    // Show SweetAlert confirmation dialog
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "Do you really want to delete this user? This action cannot be undone!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete!",
-      cancelButtonText: "Cancel",
-    });
+//  SweetAlert2 
+ const handleDelete = async (id) => {
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "Do you really want to delete this user? This action cannot be undone!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete!",
+    cancelButtonText: "Cancel",
+  });
 
-    if (result.isConfirmed) {
-      try {
-        const response = await deleteUserAPI(id);
+  if (result.isConfirmed) {
+    try {
+      const response = await deleteUserAPI(id);
 
-        if (response?.success) {
-          // Update state to remove deleted user
-          setAllUsers((prev) => prev.filter((user) => user._id !== id));
+      if (response?.success) {
+        // Remove the deleted user from the state list
+        setAllUsers((prev) => prev.filter((user) => user._id !== id));
 
-          // Show success message
-          Swal.fire("Deleted!", "User has been deleted.", "success");
-        } else {
-          Swal.fire("Error", "Failed to delete user.", "error");
-        }
-      } catch (error) {
-        console.log(error);
-        Swal.fire("Error", "An error occurred.", "error");
+        // Show success alert
+        await Swal.fire("Deleted!", "User has been deleted.", "success");
+      } else {
+        // Backend returned success: false
+        await Swal.fire("Error", response.message || "Failed to delete user.", "error");
       }
+    } catch (error) {
+      console.error("Delete user error:", error);
+      // Show generic error alert on catch block failure
+      await Swal.fire("Error", "An unexpected error occurred.", "error");
     }
-  };
+  }
+};
+
 
   useEffect(() => {
     getAllUsers();

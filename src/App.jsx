@@ -12,9 +12,6 @@ import Register from "./pages/auth/Register";
 import Landing from "./pages/Landing";
 import MyFeed from "./pages/user/Userhomepage/MyFeed";
 import Explore from "./pages/user/Userhomepage/Explore";
-import Tournaments from "./pages/user/Userhomepage/Tournaments";
-import Groups from "./pages/user/Userhomepage/Groups";
-import Friends from "./pages/user/Userhomepage/Friends";
 import Saved from "./pages/user/Userhomepage/Saved";
 import Settings from "./pages/user/Userhomepage/Settings";
 import Help from "./pages/user/Userhomepage/Help";
@@ -22,12 +19,13 @@ import Logout from "./pages/user/Userhomepage/Logout";
 import ProfileEdit from "./pages/ProfileEdit";
 import AdminDashboard from "./components/adminpage/AdminDashboard";
 import AdminUserManagement from "./components/adminpage/AdminUserManagement";
-import TournamentManagement from "./components/adminpage/TournamentManagement";
+// import TournamentManagement from "./components/adminpage/TournamentManagement";
 import GroupManagement from "./components/adminpage/GroupManagement";
 import ContentModeration from "./components/adminpage/ContentModeration";
 import AdminProfileEdit from "./components/adminpage/AdminProfileEdit";
 import CreatePost from "./pages/user/Userhomepage/CreatePost";
 import { ToastContainer } from "react-toastify";
+// import AdminTurnamentCreate from "./components/adminpage/AdminTurnamentCreate";
 
 function App() {
   return (
@@ -44,18 +42,17 @@ function App() {
         <Route path="/profile-edit" element={<AdminProfileEdit />} />
 
         <Route path="/admin-user" element={<AdminUserManagement />} />
-        <Route path="/admin-tour" element={<TournamentManagement />} />
+        {/* <Route path="/admin-tour" element={<TournamentManagement />} /> */}
         <Route path="/admin-group" element={<GroupManagement />} />
         <Route path="/admin-content" element={<ContentModeration />} />
+        {/* <Route path="/admin-create-tour" element={<AdminTurnamentCreate />} /> */}
         {/* User Pages */}
         <Route path="/home" element={<Home />} />
         <Route path="/userhome" element={<UserHome />} />
         <Route path="/user-profile" element={<ProfileEdit />} />
         <Route path="/myfeed" element={<MyFeed />} /> {/* Add this route */}
         <Route path="/explore" element={<Explore />} /> {/* Add this route */}
-        <Route path="/tournaments" element={<Tournaments />} /> {/* Add this route */}
-        <Route path="/groups" element={<Groups />} /> {/* Add this route */}
-        <Route path="/friends" element={<Friends />} /> {/* Add this route */}
+        {/* Add this route */}
         <Route path="/settings" element={<Settings />} /> {/* Add this route */}
         <Route path="/saved" element={<Saved />} /> {/* Add this route */}
         <Route path="/help" element={<Help />} /> {/* Add this route */}

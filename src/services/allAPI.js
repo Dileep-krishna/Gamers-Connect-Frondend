@@ -112,6 +112,25 @@ export const deleteUserAPI = async (id) => {
   return response.data;
 };
 
+//delete
+
+
+export const deletePostAPI = async (postId) => {
+  const token = sessionStorage.getItem("token");
+
+  const response = await axios.delete(
+    `${SERVERURL}/admin/delete-post/${postId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;  // return response data directly
+};
+
+
 
 
 
