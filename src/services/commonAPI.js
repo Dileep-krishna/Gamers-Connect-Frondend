@@ -10,7 +10,7 @@ const commonAPI = async (httpRequest, url, reqBody, reqHeader = {}) => {
 
   try {
     const res = await axios(requestConfig);
-    return res.data; // IMPORTANT
+    return res.data;
   } catch (err) {
     return err.response?.data || {
       success: false,
@@ -19,4 +19,4 @@ const commonAPI = async (httpRequest, url, reqBody, reqHeader = {}) => {
   }
 };
 
-export default commonAPI;   // ✅ FIXED
+export default commonAPI;  

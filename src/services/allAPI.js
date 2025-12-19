@@ -129,6 +129,20 @@ export const deletePostAPI = async (postId) => {
 
   return response.data;  // return response data directly
 };
+//banned user
+export const toggleBanUserAPI = async (id, reason = "") => {
+  const token = sessionStorage.getItem("token"); // your JWT token
+
+  return await commonAPI(
+    "PUT",
+    `${SERVERURL}/ban-user/${id}`,
+    { reason },
+    {
+      Authorization: `Bearer ${token}`,
+    }
+  );
+};
+
 
 
 
