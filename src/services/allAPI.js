@@ -142,6 +142,16 @@ export const toggleBanUserAPI = async (id, reason = "") => {
     }
   );
 };
+//banned user feedback
+// banned user feedback
+export const sendBanFeedbackAPI = async (reqBody) => {
+  return await commonAPI(
+    "POST",
+    `${SERVERURL}/ban-feedback`,
+    reqBody
+  );
+};
+
 
 
 

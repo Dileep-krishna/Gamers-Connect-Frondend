@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginAPI } from "../../services/allAPI";
+import { loginAPI, sendBanFeedbackAPI } from "../../services/allAPI"; // Assume you created this API
 import { toast } from "react-toastify";
 
 const Login = () => {
@@ -10,6 +10,12 @@ const Login = () => {
     email: "",
     password: ""
   });
+
+  // State for ban modal
+  const [showBanModal, setShowBanModal] = useState(false);
+  const [banReason, setBanReason] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [sendingFeedback, setSendingFeedback] = useState(false);
 
   const handLogin = async (e) => {
     e.preventDefault();
@@ -25,8 +31,14 @@ const Login = () => {
       const result = await loginAPI(login);
       console.log("LOGIN RESPONSE:", result);
 
+      // Handle banned user
+      if (result?.banReason) {
+        setBanReason(result.banReason);
+        setShowBanModal(true);
+        return;
+      }
+
       if (result.success) {
-        // ✅ STORE USER & TOKEN
         sessionStorage.setItem(
           "existingUser",
           JSON.stringify(result.existingUser)
@@ -37,13 +49,12 @@ const Login = () => {
 
         setLogin({ email: "", password: "" });
 
-        // 🔥 FRONTEND ADMIN CHECK
+        // Admin / User redirect
         if (email === "admin@gmail.com" && password === "admin") {
-          navigate("/admin");        // 👑 ADMIN PAGE
+          navigate("/admin");
         } else {
-          navigate("/userhome");     // 👤 USER PAGE
+          navigate("/userhome");
         }
-
       } else {
         toast.error(result.message || "Invalid email or password");
       }
@@ -51,6 +62,32 @@ const Login = () => {
       console.error(error);
       toast.error("Something went wrong");
     }
+  };
+
+  // Send feedback to admin
+  const handleSendFeedback = async () => {
+    if (!feedbackMessage.trim()) {
+      toast.warning("Please enter a message");
+      return;
+    }
+    setSendingFeedback(true);
+    try {
+      const payload = {
+        email: login.email,
+        message: feedbackMessage.trim()
+      };
+      const res = await sendBanFeedbackAPI(payload);
+      if (res.success) {
+        toast.success("Feedback sent to admin");
+        setFeedbackMessage("");
+        setShowBanModal(false);
+      } else {
+        toast.error(res.message || "Failed to send feedback");
+      }
+    } catch (err) {
+      toast.error("Error sending feedback");
+    }
+    setSendingFeedback(false);
   };
 
   return (
@@ -106,6 +143,45 @@ const Login = () => {
           </Link>
         </p>
       </div>
+
+      {/* Ban Modal */}
+      {showBanModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
+          <div className="bg-gray-900 rounded-lg p-6 max-w-lg w-full text-white shadow-lg">
+            <h2 className="text-xl font-semibold mb-2 text-red-500">Account Banned</h2>
+            <p className="mb-4">Admin message: <em>{banReason || "Your account has been banned."}</em></p>
+
+            <label htmlFor="feedback" className="block mb-1 font-medium">
+              Send feedback to admin:
+            </label>
+            <textarea
+              id="feedback"
+              rows={4}
+              className="w-full p-2 rounded-md bg-gray-700 text-white border border-gray-600"
+              placeholder="Explain why you think your account should be unbanned"
+              value={feedbackMessage}
+              onChange={(e) => setFeedbackMessage(e.target.value)}
+            />
+
+            <div className="flex justify-end mt-4 space-x-4">
+              <button
+                onClick={() => setShowBanModal(false)}
+                className="px-4 py-2 bg-gray-700 rounded-md hover:bg-gray-600"
+              >
+                Close
+              </button>
+              <button
+                onClick={handleSendFeedback}
+                disabled={sendingFeedback}
+                className="px-4 py-2 bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50"
+              >
+                {sendingFeedback ? "Sending..." : "Send Feedback"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
