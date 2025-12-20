@@ -19,6 +19,13 @@ const ProfileEdit = () => {
     orginalname: ""
   });
 
+  // New states for followers and following counts
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+
+  // Store userId here
+  const [userId, setUserId] = useState("");
+
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -45,6 +52,8 @@ const ProfileEdit = () => {
 
     if (token && user) {
       setTokenss(token);
+      setUserId(user._id || ""); // Set userId here
+
       setUserDetails({
         username: user.username || "",
         bio: user.bio || "",
@@ -57,6 +66,10 @@ const ProfileEdit = () => {
       setPreviewImage(
         user.profile ? `${SERVERURL}/imguploads/${user.profile}` : null
       );
+
+      // Set followers and following counts dynamically
+      setFollowersCount(user.followers?.length || 0);
+      setFollowingCount(user.following?.length || 0);
     }
   }, []);
 
@@ -143,28 +156,22 @@ const ProfileEdit = () => {
 
             {/* Stats */}
             <div className="mt-6 grid grid-cols-2 gap-4 text-center">
-              <Link to="/followers">
+              <Link to={`/following/${userId}`}>
                 <div className="bg-white/5 p-3 rounded-xl">
-                  <h3 className="text-xl font-bold">27</h3>
+                  <h3 className="text-xl font-bold">{followersCount}</h3>
                   <p className="text-sm text-gray-400">Followers</p>
                 </div>
               </Link>
-              <Link to="/following">
+
+              <Link to={`/following/${userId}`}>
                 <div className="bg-white/5 p-3 rounded-xl">
-                  <h3 className="text-xl font-bold">27</h3>
+                  <h3 className="text-xl font-bold">{followingCount}</h3>
                   <p className="text-sm text-gray-400">Following</p>
                 </div>
               </Link>
             </div>
           </div>
 
-          {/* Tips */}
-          <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/40 rounded-2xl p-5 border border-cyan-500/30">
-            <h4 className="font-semibold text-cyan-300 mb-1">💡 Pro Tip</h4>
-            <p className="text-sm text-gray-300">
-              Use a clear gaming avatar that represents your playstyle!
-            </p>
-          </div>
         </div>
 
         {/* Right Column */}

@@ -13,8 +13,8 @@ import Logout from "./pages/user/Userhomepage/Logout";
 import Friends from "./pages/user/Userhomepage/Friends";
 import CreatePost from "./pages/user/Userhomepage/CreatePost";
 import UserFeed from "./pages/user/Userhomepage/UserFeed";
-import Followers from "./pages/user/Followers";
-import Following from "./pages/user/Following";
+
+
 
 // Static pages
 import Landing from "./pages/Landing";
@@ -37,6 +37,10 @@ import GroupManagement from "./components/adminpage/GroupManagement";
 import ContentModeration from "./components/adminpage/ContentModeration";
 import AdminProfileEdit from "./components/adminpage/AdminProfileEdit";
 import AdminFeedback from "./components/adminpage/AdminFeedback";
+import FollowersFollowing from "./pages/user/FollowersFollowing";
+import Followers from "./pages/user/Followers";
+
+
 
 function App() {
   return (
@@ -64,8 +68,8 @@ function App() {
         <Route path="/myfeed" element={<MyFeed />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/friends" element={<Friends />} />
-        <Route path="/followers" element={<Followers />} />
-        <Route path="/following" element={<Following />} />
+ <Route path="/followers/:userId" element={<Followers />} />
+        <Route path="/following/:userId" element={<FollowersFollowing />} />
         <Route path="/userfeed/:userId" element={<UserFeed />} />
         <Route path="/create-post" element={<CreatePost />} />
         <Route path="/saved" element={<Saved />} />

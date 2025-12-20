@@ -169,8 +169,27 @@ export const replyToFeedbackAPI = async (payload) => {
     payload
   );
 };
+//followers
+// Example followUserAPI
+export const followUserAPI = async (userId) => {
+  const token = sessionStorage.getItem("token");
 
+  if (!userId) {
+    throw new Error("No target userId provided to followUserAPI");
+  }
 
+  const response = await axios.post(
+    `${SERVERURL}/follow/${userId}`,
+    {}, // no body required if your backend doesn't expect one
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
 
 
 
