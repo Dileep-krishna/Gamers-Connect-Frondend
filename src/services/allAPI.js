@@ -144,11 +144,29 @@ export const toggleBanUserAPI = async (id, reason = "") => {
 };
 //banned user feedback
 // banned user feedback
+// USER → send feedback
 export const sendBanFeedbackAPI = async (reqBody) => {
   return await commonAPI(
     "POST",
     `${SERVERURL}/ban-feedback`,
     reqBody
+  );
+};
+
+// ADMIN → get all feedbacks
+export const getAllFeedbacksAPI = async () => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/feedback/all`
+  );
+};
+
+// ADMIN → reply to feedback
+export const replyToFeedbackAPI = async (payload) => {
+  return await commonAPI(
+    "POST",
+    `${SERVERURL}/feedback/reply`,
+    payload
   );
 };
 

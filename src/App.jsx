@@ -25,6 +25,7 @@ import ContentModeration from "./components/adminpage/ContentModeration";
 import AdminProfileEdit from "./components/adminpage/AdminProfileEdit";
 import CreatePost from "./pages/user/Userhomepage/CreatePost";
 import { ToastContainer } from "react-toastify";
+import AdminFeedback from "./components/adminpage/AdminFeedback";
 // import AdminTurnamentCreate from "./components/adminpage/AdminTurnamentCreate";
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
         {/* Admin */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/profile-edit" element={<AdminProfileEdit />} />
+        <Route path="/profile-edit" element={<AdminFeedback />} />
 
         <Route path="/admin-user" element={<AdminUserManagement />} />
         {/* <Route path="/admin-tour" element={<TournamentManagement />} /> */}
