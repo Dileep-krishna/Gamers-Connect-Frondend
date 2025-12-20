@@ -7,10 +7,10 @@ import Swal from "sweetalert2";
 const ContentModeration = () => {
   const [posts, setPosts] = useState([]);
   const [search, setSearch] = useState("");
+  const [searchType, setSearchType] = useState("content"); // <-- new state for search type
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // 🔹 Fetch all posts (Admin)
   useEffect(() => {
     fetchPosts();
   }, []);
@@ -27,57 +27,40 @@ const ContentModeration = () => {
     }
   };
 
-  // 🔹 Delete post (Admin)
+  const handleDelete = async (postId) => {
+    const confirmed = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
 
+    if (!confirmed.isConfirmed) return;
 
-const handleDelete = async (postId) => {
-  const confirmed = await Swal.fire({
-    title: 'Are you sure?',
-    text: "You won't be able to revert this!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, delete it!'
-  });
+    try {
+      const res = await deletePostAPI(postId);
 
-  if (!confirmed.isConfirmed) return;
+      if (res.success) {
+        setPosts((prev) => prev.filter((post) => post._id !== postId));
 
-  try {
-    const res = await deletePostAPI(postId); // res is the response JSON from backend
-
-    if (res.success) {
-      // Remove post from state
-      setPosts((prev) => prev.filter((post) => post._id !== postId));
+        Swal.fire("Deleted!", "Post has been deleted.", "success");
+      } else {
+        Swal.fire("Error!", res.message || "Failed to delete the post.", "error");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
 
       Swal.fire(
-        'Deleted!',
-        'Post has been deleted.',
-        'success'
-      );
-    } else {
-      Swal.fire(
-        'Error!',
-        res.message || 'Failed to delete the post.',
-        'error'
+        "Server Error!",
+        error.response?.data?.message || error.message || "Error deleting post",
+        "error"
       );
     }
-  } catch (error) {
-    console.error("Delete error:", error);
+  };
 
-    Swal.fire(
-      'Server Error!',
-      error.response?.data?.message || error.message || 'Error deleting post',
-      'error'
-    );
-  }
-};
-
-
-
-
-
-  // 🔹 Time ago helper
   const timeAgo = (dateString) => {
     const now = new Date();
     const postDate = new Date(dateString);
@@ -89,7 +72,6 @@ const handleDelete = async (postId) => {
     return `${Math.floor(diff / 86400)}d ago`;
   };
 
-  // 🔹 File helpers
   const isVideoFile = (file) =>
     ["mp4", "webm", "ogg"].includes(file.split(".").pop().toLowerCase());
 
@@ -98,10 +80,18 @@ const handleDelete = async (postId) => {
       file.split(".").pop().toLowerCase()
     );
 
-  // 🔹 Search filter
-  const filteredPosts = posts.filter((post) =>
-    post.content?.toLowerCase().includes(search.toLowerCase())
-  );
+  // Filter posts based on selected search type and search value
+// Filter posts based on selected search type and search value
+const filteredPosts = posts.filter((post) => {
+  if (searchType === "content") {
+    return post.content?.toLowerCase().includes(search.toLowerCase());
+  } else if (searchType === "email") {
+    // Use post.userMail instead of post.email for creator's email
+    return post.userMail?.toLowerCase().includes(search.toLowerCase());
+  }
+  return true;
+});
+
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -121,21 +111,33 @@ const handleDelete = async (postId) => {
         </p>
       </div>
 
-      {/* Search */}
-      <div className="mb-8">
+      {/* Search & Search Type Selector */}
+      <div className="mb-8 flex flex-col sm:flex-row gap-4 max-w-lg">
+        <select
+          className="p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-300"
+          value={searchType}
+          onChange={(e) => setSearchType(e.target.value)}
+          aria-label="Select search type"
+        >
+          <option value="content">Search by Content</option>
+          <option value="email">Search by User Email</option>
+        </select>
+
         <input
           type="text"
-          placeholder="Search content..."
+          placeholder={
+            searchType === "content"
+              ? "Search posts content..."
+              : "Search by user email..."
+          }
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-300"
+          className="flex-1 p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-300"
         />
       </div>
 
       {/* Loading */}
-      {loading && (
-        <p className="text-center text-gray-400">Loading posts...</p>
-      )}
+      {loading && <p className="text-center text-gray-400">Loading posts...</p>}
 
       {/* Posts */}
       {!loading && filteredPosts.length === 0 ? (
@@ -163,9 +165,7 @@ const handleDelete = async (postId) => {
               </p>
 
               {/* Content */}
-              <p className="text-gray-200 mb-3 line-clamp-3">
-                {post.content}
-              </p>
+              <p className="text-gray-200 mb-3 line-clamp-3">{post.content}</p>
 
               {/* Media (small preview) */}
               {post.mediaFile?.length > 0 && (
