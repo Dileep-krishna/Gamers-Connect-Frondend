@@ -260,7 +260,11 @@ const handleUpdateProfile = async () => {
             </div>
 
             {/* Tips */}
+<<<<<<< HEAD
             {/* <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/40 backdrop-blur-xl rounded-2xl p-5 border border-cyan-500/30">
+=======
+            <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/40 backdrop-blur-xl rounded-2xl p-5 border border-cyan-500/30">
+>>>>>>> 9f761b75f9910d9523923715417d1072e243a6d4
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-cyan-500/20 rounded-lg">
                   <span className="text-cyan-400">💡</span>
@@ -272,7 +276,11 @@ const handleUpdateProfile = async () => {
                   </p>
                 </div>
               </div>
+<<<<<<< HEAD
             </div> */}
+=======
+            </div>
+>>>>>>> 9f761b75f9910d9523923715417d1072e243a6d4
           </div>
 
           {/* Right Column - Form */}

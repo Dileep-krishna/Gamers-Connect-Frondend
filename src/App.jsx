@@ -29,7 +29,10 @@ import AdminFeedback from "./components/adminpage/AdminFeedback";
 import Friends from "./pages/user/Userhomepage/Friends";
 import Followers from "./pages/user/Followers";
 import Following from "./pages/user/Following";
+<<<<<<< HEAD
 import UserFeed from "./pages/user/Userhomepage/UserFeed";
+=======
+>>>>>>> 9f761b75f9910d9523923715417d1072e243a6d4
 // import AdminTurnamentCreate from "./components/adminpage/AdminTurnamentCreate";
 
 function App() {
@@ -61,15 +64,22 @@ function App() {
         <Route path="/friends" element={<Friends />} /> {/* Add this route */}
         <Route path="/followers" element={<Followers />} /> {/* Add this route */}
         <Route path="/following" element={<Following />} /> {/* Add this route */}
+<<<<<<< HEAD
         <Route path="/userfeed/:userId" element={<UserFeed />} />
         {/* Add this route */}
+=======
+>>>>>>> 9f761b75f9910d9523923715417d1072e243a6d4
         {/* Add this route */}
         <Route path="/settings" element={<Settings />} /> {/* Add this route */}
         <Route path="/saved" element={<Saved />} /> {/* Add this route */}
         <Route path="/help" element={<Help />} /> {/* Add this route */}
         <Route path="/logout" element={<Logout />} /> {/* Add this route */}
         <Route path="/notifications" element={<Notification />} /> {/* Add this route */}
+<<<<<<< HEAD
         <Route path="/create-post" element={<CreatePost />} /> {/* Add this route */}
+=======
+        <Route path="/create-post" element={<CreatePost/>} /> {/* Add this route */}
+>>>>>>> 9f761b75f9910d9523923715417d1072e243a6d4
         <Route path="/about" element={<About />} />
         <Route path="/community" element={<Community />} />
         <Route path="/contact" element={<Contact />} />
@@ -84,6 +94,7 @@ function App() {
             </div>
           }
         />
+<<<<<<< HEAD
 
       </Routes>
       <ToastContainer
@@ -94,6 +105,18 @@ function App() {
       />
     </Router>
 
+=======
+  
+      </Routes>
+            <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        theme="colored"
+        
+        />
+    </Router>
+    
+>>>>>>> 9f761b75f9910d9523923715417d1072e243a6d4
   );
 }
 
