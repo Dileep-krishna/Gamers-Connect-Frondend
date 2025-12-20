@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllPostsAPI } from "../../../services/allAPI";
+import { getAllPostsAPI, adminUsersAPI } from "../../../services/allAPI";
 import SERVERURL from "../../../services/serverURL";
 
 const Explore = () => {
   const navigate = useNavigate();
 
   const [posts, setPosts] = useState([]);
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
 
   // 🔹 Fetch all posts
@@ -14,13 +15,25 @@ const Explore = () => {
     async function fetchPosts() {
       try {
         const data = await getAllPostsAPI();
-        // If API returns { success, posts }, use: data.posts
         setPosts(data);
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
     }
     fetchPosts();
+  }, []);
+
+  // 🔹 Fetch all users
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const result = await adminUsersAPI();
+        setUsers(result);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    }
+    fetchUsers();
   }, []);
 
   // 🔹 Time ago formatter
@@ -44,9 +57,14 @@ const Explore = () => {
       file.split(".").pop().toLowerCase()
     );
 
-  // 🔹 Search filter
+  // 🔹 Post search filter
   const filteredPosts = posts.filter((post) =>
     post.content?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // 🔹 User search filter
+  const filteredUsers = users.filter((user) =>
+    user.username?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -73,14 +91,45 @@ const Explore = () => {
       <div className="mb-10">
         <input
           type="text"
-          placeholder="Search posts..."
+          placeholder="Search posts or users..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:border-purple-500"
         />
       </div>
 
-      {/* Explore Posts */}
+      {/* 🔹 USERS RESULT (only if matched) */}
+      {search && filteredUsers.length > 0 && (
+        <>
+          <h2 className="text-2xl font-semibold mb-4">👤 Users</h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            {filteredUsers.map((user) => (
+              <div
+                key={user._id}
+                className="bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-purple-500 transition flex items-center gap-4"
+              >
+                <img
+                  src={
+                    user.profile
+                      ? `${SERVERURL}/imguploads/${user.profile}`
+                      : "https://i.pravatar.cc/100"
+                  }
+                  alt="user"
+                  className="w-14 h-14 rounded-full object-cover"
+                />
+
+                <div>
+                  <p className="font-semibold">{user.username}</p>
+                  <p className="text-sm text-gray-400">{user.bio || "Gamer"}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* 🔹 POSTS SECTION */}
       <h2 className="text-2xl font-semibold mb-4">🌍 Explore Posts</h2>
 
       {filteredPosts.length === 0 ? (
@@ -112,7 +161,6 @@ const Explore = () => {
                       key={index}
                       className="w-full h-56 bg-black rounded-lg overflow-hidden"
                     >
-                      {/* VIDEO */}
                       {isVideoFile(file) && (
                         <video
                           src={`${SERVERURL}/imguploads/${file}`}
@@ -120,14 +168,10 @@ const Explore = () => {
                           muted
                           loop
                           playsInline
-                          controls={false}
-                          disablePictureInPicture
                           className="w-full h-full object-cover"
                         />
                       )}
 
-
-                      {/* IMAGE */}
                       {isImageFile(file) && (
                         <img
                           src={`${SERVERURL}/imguploads/${file}`}

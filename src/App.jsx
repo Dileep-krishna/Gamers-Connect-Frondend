@@ -26,6 +26,9 @@ import AdminProfileEdit from "./components/adminpage/AdminProfileEdit";
 import CreatePost from "./pages/user/Userhomepage/CreatePost";
 import { ToastContainer } from "react-toastify";
 import AdminFeedback from "./components/adminpage/AdminFeedback";
+import Friends from "./pages/user/Userhomepage/Friends";
+import Followers from "./pages/user/Followers";
+import Following from "./pages/user/Following";
 // import AdminTurnamentCreate from "./components/adminpage/AdminTurnamentCreate";
 
 function App() {
@@ -54,6 +57,9 @@ function App() {
         <Route path="/user-profile" element={<ProfileEdit />} />
         <Route path="/myfeed" element={<MyFeed />} /> {/* Add this route */}
         <Route path="/explore" element={<Explore />} /> {/* Add this route */}
+        <Route path="/friends" element={<Friends />} /> {/* Add this route */}
+        <Route path="/followers" element={<Followers />} /> {/* Add this route */}
+        <Route path="/following" element={<Following />} /> {/* Add this route */}
         {/* Add this route */}
         <Route path="/settings" element={<Settings />} /> {/* Add this route */}
         <Route path="/saved" element={<Saved />} /> {/* Add this route */}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { toast } from "react-toastify";
-import { getAllFeedbacksAPI } from "../../services/allAPI";
+import { getAllFeedbacksAPI, replyToFeedbackAPI } from "../../services/allAPI";
 
 const AdminFeedback = () => {
   const [users, setUsers] = useState([]);
@@ -25,7 +25,7 @@ const AdminFeedback = () => {
       return;
     }
 
-    const res = await replyToFeedbackAPi({
+    const res = await replyToFeedbackAPI({
       email,
       message: replyText
     });

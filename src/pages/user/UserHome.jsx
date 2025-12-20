@@ -51,8 +51,7 @@ const UserHome = () => {
     { icon: 'home', label: 'Home', path: '/userhome' },
     { icon: 'newspaper', label: 'My Feed', path: '/myfeed' },
     { icon: 'explore', label: 'Explore', path: '/explore' },
-
-
+    { icon: '', label: 'Friends', path: '/friends' },
     { icon: 'settings', label: 'Settings', path: '/settings' },
     { icon: 'help', label: 'Help & Support', path: '/help' },
     { icon: 'logout', label: 'Logout', path: '/logout' }

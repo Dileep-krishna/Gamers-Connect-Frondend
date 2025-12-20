@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import SERVERURL from '../services/serverURL';
 import { updateUserProfileAPI } from '../services/allAPI';
 
@@ -244,12 +244,16 @@ const handleUpdateProfile = async () => {
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white/5 rounded-xl p-3 text-center">
+                   <Link to={"/followers"} >
                     <div className="text-2xl font-bold text-cyan-400">27</div>
-                    <div className="text-xs text-gray-400">Games Played</div>
+                    <div className="text-xs text-gray-400">Followers</div>
+                    </Link>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <div className="text-2xl font-bold text-green-400">89%</div>
-                    <div className="text-xs text-gray-400">Win Rate</div>
+                  <Link to={"/following"} >
+                    <div className="text-2xl font-bold text-cyan-400">27</div>
+                    <div className="text-xs text-gray-400 align-items-center d-flex justify-content-center">Following</div>
+                    </Link>
                   </div>
                 </div>
               </div>
