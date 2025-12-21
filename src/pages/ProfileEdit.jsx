@@ -19,7 +19,7 @@ const ProfileEdit = () => {
     orginalname: ""
   });
 
-  // New states for followers and following counts
+  // Followers and following counts states
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
@@ -52,7 +52,7 @@ const ProfileEdit = () => {
 
     if (token && user) {
       setTokenss(token);
-      setUserId(user._id || ""); // Set userId here
+      setUserId(user._id || "");
 
       setUserDetails({
         username: user.username || "",
@@ -67,7 +67,6 @@ const ProfileEdit = () => {
         user.profile ? `${SERVERURL}/imguploads/${user.profile}` : null
       );
 
-      // Set followers and following counts dynamically
       setFollowersCount(user.followers?.length || 0);
       setFollowingCount(user.following?.length || 0);
     }
@@ -88,6 +87,28 @@ const ProfileEdit = () => {
 
       if (result.success) {
         alert("Profile updated successfully");
+
+        // Get old existingUser from sessionStorage
+        const oldUser = JSON.parse(sessionStorage.getItem("existingUser"));
+
+        // Update only username, bio, orginalname, and profile (if updated)
+        const updatedUser = {
+          ...oldUser,
+          username: userDetails.username,
+          bio: userDetails.bio,
+          orginalname: userDetails.orginalname,
+          profile: result.updatedProfile || oldUser.profile,
+          // Keep followers and following as they were in oldUser
+          followers: oldUser.followers,
+          following: oldUser.following,
+        };
+
+        sessionStorage.setItem("existingUser", JSON.stringify(updatedUser));
+
+        // Update counts state from updatedUser
+        setFollowersCount(updatedUser.followers?.length || 0);
+        setFollowingCount(updatedUser.following?.length || 0);
+
         navigate("/userhome");
       } else {
         alert("Profile update failed");

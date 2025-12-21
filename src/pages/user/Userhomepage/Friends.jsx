@@ -1,166 +1,130 @@
 import React, { useEffect, useState } from "react";
-import { adminUsersAPI, followUserAPI } from "../../../services/allAPI";
-import SERVERURL from "../../../services/serverURL";
+import SERVERURL from "../../../services/serverURL"; // adjust path
 
 function Friends() {
-  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [friends, setFriends] = useState([]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const existingUserJSON = sessionStorage.getItem("existingUser");
-  const loggedInUserId = existingUserJSON ? JSON.parse(existingUserJSON)._id : null;
-
-  // Fetch all users from backend
-  const getAllUsers = async () => {
-    setLoading(true);
+  // Parse user inside component render, so it's fresh
+  const existingUser = React.useMemo(() => {
     try {
-      const result = await adminUsersAPI();
-      if (Array.isArray(result)) {
-        setUsers(result);
-      }
-    } catch (error) {
-      console.error("Error fetching users", error);
-    } finally {
-      setLoading(false);
+      return JSON.parse(sessionStorage.getItem("existingUser"));
+    } catch {
+      return null;
     }
-  };
-
-  useEffect(() => {
-    getAllUsers();
   }, []);
 
-  // Optimistically toggle follow/unfollow
-  const handleFollowToggle = async (targetUserId, event) => {
-    event.preventDefault();
-
-    if (!loggedInUserId) {
-      console.warn("No logged in user ID found. Please login first.");
-      return;
-    }
-    if (targetUserId === loggedInUserId) {
-      console.warn("You can't follow yourself.");
+  useEffect(() => {
+    if (!existingUser || !Array.isArray(existingUser.following) || existingUser.following.length === 0) {
+      setLoading(false);
       return;
     }
 
-    // Find the target user in the users array
-    const targetUser = users.find((u) => u._id === targetUserId);
-    if (!targetUser) return;
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const token = sessionStorage.getItem("token");
+        const res = await fetch(`${SERVERURL}/get-allUsers`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) throw new Error("Failed to fetch users");
+        const data = await res.json();
 
-    const isCurrentlyFollowing = (targetUser.followers || []).some(
-      (followerId) => followerId === loggedInUserId
-    );
-
-    // Optimistically update UI: add/remove loggedInUserId in targetUser's followers
-    setUsers((prevUsers) =>
-      prevUsers.map((u) => {
-        if (u._id === targetUserId) {
-          let updatedFollowers;
-          if (isCurrentlyFollowing) {
-            // unfollow: remove loggedInUserId
-            updatedFollowers = (u.followers || []).filter((id) => id !== loggedInUserId);
-          } else {
-            // follow: add loggedInUserId
-            updatedFollowers = [...(u.followers || []), loggedInUserId];
-          }
-          return { ...u, followers: updatedFollowers };
+        const usersList = data?.data?.users || data?.users || data;
+        if (!Array.isArray(usersList)) {
+          throw new Error("Invalid users data");
         }
-        return u;
-      })
+        setAllUsers(usersList);
+
+        const followingUsers = usersList.filter((user) =>
+          existingUser.following.some((fid) => fid.toString() === user._id.toString())
+        );
+        setFriends(followingUsers);
+      } catch (err) {
+        setError(err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [existingUser]);
+
+  if (loading) {
+    return (
+      <p className="text-gray-400 text-center mt-10">Loading friends...</p>
     );
+  }
 
-    try {
-      // Call backend API to toggle follow/unfollow
-      await followUserAPI(targetUserId);
-    } catch (err) {
-      console.error("Follow API error, reverting UI", err);
-      // On error, revert back the optimistic update
-      setUsers((prevUsers) =>
-        prevUsers.map((u) => {
-          if (u._id === targetUserId) {
-            return { ...u, followers: targetUser.followers || [] }; // revert to original
-          }
-          return u;
-        })
-      );
-      alert("Failed to update follow status. Please try again.");
-    }
-  };
+  if (error) {
+    return (
+      <p className="text-red-500 text-center mt-10">
+        Error loading friends: {error}
+      </p>
+    );
+  }
 
-  // Filter users based on search input
-  const filteredUsers = users.filter(
-    (user) =>
-      user.username?.toLowerCase().includes(search.toLowerCase()) ||
-      user.email?.toLowerCase().includes(search.toLowerCase())
+  if (!existingUser) {
+    return (
+      <p className="text-gray-400 text-center mt-10">No user session found. Please login.</p>
+    );
+  }
+
+  if (existingUser.following.length === 0) {
+    return (
+      <p className="text-gray-400 text-center mt-10">You are not following anyone.</p>
+    );
+  }
+
+  const filteredFriends = friends.filter((user) =>
+    user.username.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] p-6">
-      <h1 className="text-3xl font-bold text-white mb-4 text-center">
-        Discover Gamers
-      </h1>
+    <div className="min-h-screen bg-[#0f0f1a] p-6">
+      <h2 className="text-2xl font-bold text-white mb-6">Friends</h2>
 
-      <div className="max-w-md mx-auto mb-8">
-        <input
-          type="text"
-          placeholder="Search gamers..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full px-4 py-2 rounded-xl bg-white/10 text-white placeholder-gray-300 outline-none border border-white/20 focus:border-purple-500"
-        />
-      </div>
+      <input
+        type="text"
+        placeholder="Search friends..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="bg-[#1a1a2e] text-white px-4 py-2 rounded-lg border border-purple-500/30 focus:outline-none w-full md:w-64 mb-6"
+      />
 
-      {loading && <p className="text-center text-gray-300">Loading gamers...</p>}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredUsers.map((user) => {
-          if (user._id === loggedInUserId) return null;
-
-          const isFollowing = (user.followers || []).some(
-            (followerId) => followerId === loggedInUserId
-          );
-
-          return (
+      {filteredFriends.length === 0 ? (
+        <p className="text-gray-400 text-center">No friends match your search.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredFriends.map((friend) => (
             <div
-              key={user._id}
-              className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 hover:scale-105 transition"
+              key={friend._id}
+              className="bg-[#1a1a2e] p-4 rounded-xl flex items-center justify-between"
             >
               <div className="flex items-center gap-4">
                 <img
                   src={
-                    user.profile
-                      ? `${SERVERURL}/Imguploads/${user.profile}`
-                      : "https://i.pravatar.cc/150"
+                    friend.profile
+                      ? `${SERVERURL}/imguploads/${friend.profile}`
+                      : "https://cdn-icons-png.flaticon.com/512/149/149071.png"
                   }
-                  alt="profile"
-                  className="w-14 h-14 rounded-full border-2 border-purple-500 object-cover"
+                  alt={friend.username}
+                  className="w-12 h-12 rounded-full border border-purple-500 object-cover"
                 />
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{user.username}</h3>
-                  <p className="text-sm text-gray-300">{user.bio || "Gamer"}</p>
+                  <p className="text-white font-semibold">{friend.username}</p>
                 </div>
               </div>
-
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-gray-300 text-sm">
-                  {(user.followers || []).length} Followers
-                </span>
-
-                <button
-                  type="button"
-                  onClick={(e) => handleFollowToggle(user._id, e)}
-                  className={`px-4 py-1 rounded-full text-white transition ${
-                    isFollowing
-                      ? "bg-gray-700 hover:bg-red-600"
-                      : "bg-purple-600 hover:bg-purple-700"
-                  }`}
-                >
-                  {isFollowing ? "Following" : "Follow"}
-                </button>
-              </div>
+              <span className="text-purple-400 text-sm">Message</span>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
