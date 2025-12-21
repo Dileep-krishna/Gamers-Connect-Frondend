@@ -4,24 +4,65 @@ import Notifications from './Userhomepage/Notifications';
 import { getAllPostsAPI, getUserProfileAPI } from '../../services/allAPI';
 import SERVERURL from '../../services/serverURL';
 
-
 const UserHome = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showNotifications, setShowNotifications] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch posts on mount
+  // Fetch user profile and posts on mount
   useEffect(() => {
-    async function fetchPosts() {
+    async function fetchData() {
       try {
-        const data = await getAllPostsAPI();
-        setPosts(data);
+        // Fetch user profile
+        const userResult = await getUserProfileAPI();
+        if (userResult.success) {
+          setUser(userResult.user);
+          sessionStorage.setItem(
+            "existingUser",
+            JSON.stringify(userResult.user)
+          );
+        }
+
+        // Fetch posts
+        const postsData = await getAllPostsAPI();
+        setPosts(postsData);
       } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
       }
     }
-    fetchPosts();
+    fetchData();
+  }, []);
+
+  // Fetch unread notification count
+  useEffect(() => {
+    async function fetchUnreadCount() {
+      try {
+        const token = sessionStorage.getItem("token");
+        const res = await fetch(`${SERVERURL}/notifications`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          const count = data.notifications.filter(
+            (n) => !(n.read ?? n.isRead)
+          ).length;
+          setUnreadCount(count);
+        }
+      } catch (err) {
+        console.error("Failed to fetch notification count", err);
+      }
+    }
+
+    fetchUnreadCount();
   }, []);
 
   // Helper: format createdAt to "time ago"
@@ -35,6 +76,7 @@ const UserHome = () => {
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     return `${Math.floor(diff / 86400)}d ago`;
   }
+
   const isVideoFile = (file) => {
     const ext = file.split('.').pop().toLowerCase();
     return ['mp4', 'webm', 'ogg'].includes(ext);
@@ -45,55 +87,47 @@ const UserHome = () => {
     return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext);
   };
 
-
   // Navigation items with active detection
   const navItems = [
-    { icon: 'home', label: 'Home', path: '/userhome' },
-    { icon: 'newspaper', label: 'My Feed', path: '/myfeed' },
-    { icon: 'explore', label: 'Explore', path: '/explore' },
-    { icon: '', label: 'Friends', path: '/friends' },
-    { icon: 'settings', label: 'Settings', path: '/settings' },
-    { icon: 'help', label: 'Help & Support', path: '/help' },
-    { icon: 'logout', label: 'Logout', path: '/logout' }
-  ];
+  { icon: 'sports_esports', label: 'Home', path: '/userhome' },
+  { icon: 'feed', label: 'My Feed', path: '/myfeed' },
+  { icon: 'travel_explore', label: 'Explore', path: '/explore' },
+  { icon: 'groups', label: 'Friends', path: '/friends' },
 
-  // Dummy user avatar URL (replace with dynamic source)
-  const userAvatarURL = 'https://i.pravatar.cc/150?img=10';
+  { icon: 'settings', label: 'Settings', path: '/settings' },
+  { icon: 'help_center', label: 'Help & Support', path: '/help' },
+  { icon: 'exit_to_app', label: 'Logout', path: '/logout' }
+];
 
-  const [user, setUser] = useState(null);
+  const handleNotificationClick = async () => {
+    setShowNotifications(!showNotifications);
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
-
-  const fetchUserProfile = async () => {
-    try {
-      const result = await getUserProfileAPI();
-
-      if (result.success) {
-        setUser(result.user);
-
-        // 🔹 OPTIONAL: keep updated user in sessionStorage
-        sessionStorage.setItem(
-          "existingUser",
-          JSON.stringify(result.user)
-        );
+    if (unreadCount > 0) {
+      try {
+        const token = sessionStorage.getItem("token");
+        await fetch(`${SERVERURL}/notifications/mark-all-read`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUnreadCount(0);
+      } catch (err) {
+        console.error("Failed to mark notifications as read", err);
       }
-    } catch (error) {
-      console.log(error);
     }
   };
-  if (!user) {
+
+  // Loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
-        Loading profile...
+        Loading...
       </div>
     );
   }
 
-
   return (
-
     <div className="min-h-screen bg-gray-900 text-white relative">
       {/* Material Symbols stylesheet */}
       <link
@@ -143,18 +177,21 @@ const UserHome = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Notifications button */}
+            {/* 🔔 NOTIFICATIONS */}
             <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative flex items-center justify-center rounded-lg h-10 w-10 bg-black/40 text-white/80 hover:bg-white/10 transition-colors"
-              aria-label="Notifications"
+              onClick={handleNotificationClick}
+              className="relative flex items-center justify-center rounded-lg h-10 w-10 bg-black/40 hover:bg-white/10"
             >
-              <span className="material-symbols-outlined text-2xl">notifications</span>
-              <div className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                3
-              </div>
+              <span className="material-symbols-outlined text-2xl">
+                notifications
+              </span>
+              {unreadCount > 0 && (
+                <div className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold">
+                  {unreadCount}
+                </div>
+              )}
             </button>
-
+            
             {/* User avatar */}
             <div
               className="bg-cover bg-center rounded-full w-10 h-10 border-2 border-purple-500 cursor-pointer"
@@ -166,8 +203,6 @@ const UserHome = () => {
               onClick={() => navigate('/user-profile')}
               title="User Profile"
             />
-
-
           </div>
         </header>
 
@@ -202,45 +237,56 @@ const UserHome = () => {
                       onClick={() => navigate('/user-profile')}
                       title="User Profile"
                     />
-
-
                     <div className="flex flex-col">
                       <h1 className="text-white text-lg font-bold">
-                        {user?.username}
+                        {user?.username || 'User'}
                       </h1>
-
                       <p className="text-gray-400 mt-1">
                         {user?.bio || "No bio added"}
                       </p>
-
                     </div>
                   </div>
 
-                  {/* <div className="flex flex-col gap-2">
-                    <p className="text-white text-sm font-medium">XP</p>
-                    <div className="rounded-full bg-gray-700 h-2">
-                      <div className="h-full rounded-full bg-purple-500" style={{ width: '75%' }} />
-                    </div>
-                    <p className="text-gray-400 text-xs">3,450 / 5,000 XP</p>
-                  </div> */}
-
                   {/* Navigation Menu */}
-                  <nav className="flex flex-col gap-2 pt-2">
-                    {navItems.map((item, index) => {
-                      const isActive = location.pathname === item.path;
-                      return (
-                        <button
-                          key={index}
-                          onClick={() => navigate(item.path)}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors w-full text-left ${isActive ? 'bg-purple-500/30 text-white' : 'hover:bg-white/10 text-gray-300'
-                            }`}
-                        >
-                          <span className="material-symbols-outlined text-2xl">{item.icon}</span>
-                          <p className="text-sm font-medium">{item.label}</p>
-                        </button>
-                      );
-                    })}
-                  </nav>
+              {/* Navigation Menu */}
+<nav className="flex flex-col gap-1 pt-2">
+  {navItems.map((item, index) => {
+    const isActive = location.pathname === item.path;
+    return (
+      <button
+        key={index}
+        onClick={() => {
+          if (item.label === 'Logout') {
+            // Handle logout logic here
+            sessionStorage.clear();
+            navigate('/login');
+          } else {
+            navigate(item.path);
+          }
+        }}
+        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 w-full text-left group ${
+          isActive 
+            ? 'bg-gradient-to-r from-purple-600/30 to-purple-500/20 text-white shadow-lg shadow-purple-500/20 border-l-4 border-purple-500' 
+            : 'hover:bg-white/5 text-gray-300 hover:text-white hover:translate-x-1'
+        }`}
+      >
+        <span className={`material-symbols-outlined text-2xl transition-transform duration-200 ${
+          isActive 
+            ? 'text-purple-400' 
+            : 'text-gray-400 group-hover:text-purple-400 group-hover:scale-110'
+        }`}>
+          {item.icon}
+        </span>
+        <p className="text-sm font-medium">{item.label}</p>
+        {isActive && (
+          <span className="ml-auto material-symbols-outlined text-purple-400 text-lg">
+            arrow_forward
+          </span>
+        )}
+      </button>
+    );
+  })}
+</nav>
                 </div>
               </div>
             </aside>
@@ -262,8 +308,6 @@ const UserHome = () => {
                         onClick={() => navigate('/user-profile')}
                         title="User Profile"
                       />
-
-
                     </div>
                     <div className="flex flex-1 flex-col">
                       <textarea
@@ -285,7 +329,6 @@ const UserHome = () => {
                               <span className="material-symbols-outlined text-xl">videocam</span>
                             </button>
                           </Link>
-
                         </div>
                         <button
                           onClick={() => navigate('/create-post')}
@@ -306,8 +349,8 @@ const UserHome = () => {
                     <button
                       key={tab}
                       className={`pb-3 pt-2 whitespace-nowrap border-b-2 transition-colors ${tab === 'following'
-                        ? 'border-purple-500 text-white'
-                        : 'border-transparent text-gray-400 hover:text-white'
+                          ? 'border-purple-500 text-white'
+                          : 'border-transparent text-gray-400 hover:text-white'
                         }`}
                     >
                       <p className="text-sm font-bold capitalize">{tab}</p>
@@ -355,7 +398,6 @@ const UserHome = () => {
                           <p className="text-gray-200 text-lg mb-4 leading-relaxed">{post.content}</p>
 
                           {/* Media */}
-                          {/* Media */}
                           {post.mediaFile && post.mediaFile.length > 0 && (
                             <div className="mb-4 grid grid-cols-1 gap-3">
                               {post.mediaFile.map((file, idx) => {
@@ -393,7 +435,6 @@ const UserHome = () => {
                               })}
                             </div>
                           )}
-
 
                           {/* Tags */}
                           <div className="flex flex-wrap gap-2 mb-4">

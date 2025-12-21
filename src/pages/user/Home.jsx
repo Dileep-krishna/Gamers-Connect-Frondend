@@ -89,75 +89,70 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black">
+    <div className="min-h-screen text-white relative">
+      {/* Gaming Background Image - CHANGED */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
+        style={{
+          backgroundImage: 'url("https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80")'
+        }}
+      />
+
+      {/* Dark Overlay for better readability */}
+      <div className="fixed inset-0 bg-gradient-to-b from-gray-900/95 via-purple-900/50 to-black/95 z-0"></div>
 
       {/* ---------------------- FIXED NAVBAR ---------------------- */}
- <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-gray-900/95 via-purple-900/95 to-gray-900/95 backdrop-blur-xl border-b border-purple-500/30 z-50 shadow-2xl">
-  <div className="w-full px-6 py-4 flex items-center">
+      <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-gray-900/95 via-purple-900/95 to-gray-900/95 backdrop-blur-xl border-b border-purple-500/30 z-50 shadow-2xl">
+        <div className="w-full px-6 py-4 flex items-center">
+          {/* LEFT — LOGO */}
+          <div className="flex flex-1 justify-start">
+            <Link to="/home" className="flex items-center space-x-3 group">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                🎮
+              </div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Gamers Connect
+              </h1>
+            </Link>
+          </div>
 
-    {/* LEFT — LOGO */}
-    <div className="flex flex-1 justify-start">
-      <Link to="/home" className="flex items-center space-x-3 group">
-        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-          🎮
+          {/* CENTER — NAVIGATION LINKS */}
+          <div className="flex flex-1 justify-center gap-6">
+            {[
+              { to: "/home", label: "Home", emoji: "🏠" },
+              { to: "/about", label: "About", emoji: "ℹ️" },
+              { to: "/community", label: "Community", emoji: "🌐" },
+              { to: "/contact", label: "Contact", emoji: "📞" },
+              { to: "/features", label: "Features", emoji: "✨" }
+            ].map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold text-gray-300 hover:text-white hover:bg-purple-600/20 transition-all duration-300 hover:scale-105"
+              >
+                <span className="text-lg">{item.emoji}</span>
+                <span>{item.label}</span>
+              </Link>
+            ))}
+          </div>
+
+          {/* RIGHT — AUTH BUTTONS */}
+          <div className="flex flex-1 justify-end gap-3">
+            <Link
+              to="/login"
+              className="px-6 py-2.5 rounded-xl bg-gray-800 text-white hover:bg-gray-700 transition-all duration-300 font-semibold border border-gray-600 hover:border-purple-500"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-purple-500/25"
+            >
+              Sign Up
+            </Link>
+          </div>
         </div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-          Gamers Connect
-        </h1>
-      </Link>
-    </div>
-
-    {/* CENTER — NAVIGATION LINKS */}
-    <div className="flex flex-1 justify-center gap-6">
-      {[
-        { to: "/home", label: "Home", emoji: "🏠" },
-        { to: "/about", label: "About", emoji: "ℹ️" },
-        { to: "/community", label: "Community", emoji: "🌐" },
-        { to: "/contact", label: "Contact", emoji: "📞" },
-        { to: "/features", label: "Features", emoji: "✨" }
-      ].map((item) => (
-        <Link
-          key={item.to}
-          to={item.to}
-          className="flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold text-gray-300 hover:text-white hover:bg-purple-600/20 transition-all duration-300 hover:scale-105"
-        >
-          <span className="text-lg">{item.emoji}</span>
-          <span>{item.label}</span>
-        </Link>
-      ))}
-    </div>
-
-    {/* RIGHT — AUTH BUTTONS */}
-    <div className="flex flex-1 justify-end gap-3">
-      <Link
-        to="/login"
-        className="px-6 py-2.5 rounded-xl bg-gray-800 text-white hover:bg-gray-700 transition-all duration-300 font-semibold border border-gray-600 hover:border-purple-500"
-      >
-        Login
-      </Link>
-      <Link
-        to="/register"
-        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-purple-500/25"
-      >
-        Sign Up
-      </Link>
-    </div>
-
-  </div>
-</nav>
-
-
-
-      {/* ------------------------------------------------------------- */}
-
-      {/* Background */}
-      <div
-        className="fixed inset-0 bg-cover bg-center opacity-10 z-0"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=2070&q=80')",
-        }}
-      ></div>
+      </nav>
 
       {/* Main Content - Added padding top to account for fixed navbar */}
       <div className="relative z-10 pt-24">
@@ -170,8 +165,7 @@ const HomePage = () => {
             </h1>
 
             <p className="text-2xl md:text-3xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-              Connect with millions of gamers worldwide. Share your epic moments, join tournaments, 
-              and climb the leaderboards in the ultimate gaming community.
+              Connect with millions of gamers worldwide. Share your epic moments With Us........
             </p>
 
             <div className="flex justify-center gap-6 flex-wrap">
@@ -183,7 +177,7 @@ const HomePage = () => {
               </Link>
               <Link
                 to="/features"
-                className="px-8 py-4 bg-gray-800 hover:bg-gray-700 rounded-2xl font-bold text-xl transition-all duration-300 transform hover:scale-105 border-2 border-purple-500/50"
+                className="px-8 py-4 bg-gray-800/80 backdrop-blur-sm hover:bg-gray-700/80 rounded-2xl font-bold text-xl transition-all duration-300 transform hover:scale-105 border-2 border-purple-500/50"
               >
                 ✨ Explore Features
               </Link>
@@ -193,15 +187,15 @@ const HomePage = () => {
             <div className="grid grid-cols-3 gap-8 mt-20 max-w-2xl mx-auto">
               <div className="text-center">
                 <div className="text-4xl font-bold text-purple-400">500K+</div>
-                <div className="text-gray-400">Active Gamers</div>
+                <div className="text-gray-300">Active Gamers</div>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-blue-400">50K+</div>
-                <div className="text-gray-400">Daily Clips</div>
+                <div className="text-gray-300">Daily Clips</div>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-pink-400">100+</div>
-                <div className="text-gray-400">Tournaments</div>
+                <div className="text-gray-300">Tournaments</div>
               </div>
             </div>
           </div>
@@ -222,7 +216,7 @@ const HomePage = () => {
                     className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-lg ${
                       activeCategory === category
                         ? "bg-purple-600 text-white shadow-lg"
-                        : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
+                        : "bg-gray-800/80 backdrop-blur-sm text-gray-300 hover:bg-gray-700/80 hover:text-white"
                     }`}
                   >
                     {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -448,10 +442,10 @@ const HomePage = () => {
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   Gamers Connect
                 </h1>
-                <p className="text-gray-400 mt-2">The ultimate gaming community platform</p>
+                <p className="text-gray-300 mt-2">The ultimate gaming community platform</p>
               </div>
               <div className="text-right">
-                <p className="text-gray-400">Join millions of gamers worldwide</p>
+                <p className="text-gray-300">Join millions of gamers worldwide</p>
                 <div className="flex gap-4 mt-4">
                   <span className="text-2xl">🎮</span>
                   <span className="text-2xl">🏆</span>

@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import SERVERURL from '../services/serverURL';
 import { updateUserProfileAPI } from '../services/allAPI';
+import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 const ProfileEdit = () => {
   const navigate = useNavigate();
@@ -86,7 +88,7 @@ const ProfileEdit = () => {
       const result = await updateUserProfileAPI(formData);
 
       if (result.success) {
-        alert("Profile updated successfully");
+        toast.success("Profile updated successfully");
 
         // Get old existingUser from sessionStorage
         const oldUser = JSON.parse(sessionStorage.getItem("existingUser"));
@@ -120,126 +122,200 @@ const ProfileEdit = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 text-white">
+    <div className="min-h-screen text-white relative">
+      {/* Gaming Background Image */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
+        style={{
+          backgroundImage: 'url("https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80")',
+          backgroundAttachment: 'fixed'
+        }}
+      />
 
-      {/* Header */}
-      <div className="px-6 py-4 max-w-4xl mx-auto flex items-center justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-3 bg-white/10 hover:bg-white/20 rounded-xl"
-        >
-          ←
-        </button>
-
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-          PROFILE EDIT
-        </h1>
-
-        <div className="w-10"></div>
-      </div>
-
-      {/* Body */}
-      <div className="max-w-4xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        {/* Left Column */}
-        <div className="space-y-6">
-          <div className="bg-gray-900/60 rounded-2xl p-6 border border-white/10">
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-
-            <div
-              className="w-48 h-48 mx-auto rounded-xl overflow-hidden cursor-pointer"
-              onClick={handleProfilePictureClick}
-            >
-              {previewImage ? (
-                <img src={previewImage} alt="profile" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-700">
-                  Upload Photo
-                </div>
-              )}
-            </div>
-
-            {previewImage && (
-              <button
-                onClick={handleRemovePhoto}
-                className="mt-3 w-full py-2 bg-white/10 rounded-lg"
-              >
-                Remove Photo
-              </button>
-            )}
-
-            {/* Stats */}
-            <div className="mt-6 grid grid-cols-2 gap-4 text-center">
-              <Link to={`/following/${userId}`}>
-                <div className="bg-white/5 p-3 rounded-xl">
-                  <h3 className="text-xl font-bold">{followersCount}</h3>
-                  <p className="text-sm text-gray-400">Followers</p>
-                </div>
-              </Link>
-
-              <Link to={`/following/${userId}`}>
-                <div className="bg-white/5 p-3 rounded-xl">
-                  <h3 className="text-xl font-bold">{followingCount}</h3>
-                  <p className="text-sm text-gray-400">Following</p>
-                </div>
-              </Link>
+      <div className="relative z-10">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-gray-900/90 to-purple-900/70 backdrop-blur-xl border-b border-purple-500/30">
+          <div className="container mx-auto px-6 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="flex items-center gap-3 group"
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-xl">←</span>
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-white">Edit Gaming Profile</h1>
+                    <p className="text-gray-300 text-sm">Customize your virtual identity</p>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
-
         </div>
 
-        {/* Right Column */}
-        <div className="lg:col-span-2 bg-gray-900/60 rounded-2xl p-8 border border-white/10">
+        {/* Main Content */}
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - Profile Picture & Stats */}
+            <div className="lg:col-span-1">
+              <div className="bg-gradient-to-br from-gray-900/90 to-gray-900/90 backdrop-blur-xl rounded-3xl border border-purple-500/30 p-8 shadow-2xl">
+                {/* File Input */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
 
-          <div className="space-y-6">
-            <input
-              type="text"
-              placeholder="Gamertag"
-              value={userDetails.username}
-              onChange={(e) => setUserDetails({ ...userDetails, username: e.target.value })}
-              className="w-full p-4 bg-white/5 rounded-xl"
-            />
+                {/* Profile Picture */}
+                <div className="relative mx-auto mb-6">
+                  <div 
+                    onClick={handleProfilePictureClick}
+                    className="relative w-64 h-64 mx-auto rounded-2xl overflow-hidden cursor-pointer group border-4 border-purple-500/50 hover:border-purple-400 transition-all duration-300"
+                  >
+                    {previewImage ? (
+                      <img 
+                        src={previewImage} 
+                        alt="profile" 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                        <span className="text-4xl mb-2">📷</span>
+                        <span className="text-gray-400">Upload Photo</span>
+                        <span className="text-gray-500 text-sm mt-1">Click to add profile picture</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <span className="text-white text-lg font-semibold">Change Photo</span>
+                    </div>
+                  </div>
+                  
+                  {/* Remove Photo Button */}
+                  {previewImage && (
+                    <button
+                      onClick={handleRemovePhoto}
+                      className="mt-4 w-full py-3 bg-gradient-to-r from-red-600/20 to-red-600/10 backdrop-blur-sm rounded-xl text-red-300 hover:text-red-200 hover:bg-red-600/30 transition-all duration-300 border border-red-500/30 hover:border-red-400/50"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <span>🗑️</span>
+                        Remove Photo
+                      </span>
+                    </button>
+                  )}
+                </div>
 
-            <input
-              type="text"
-              placeholder="Display Name"
-              value={userDetails.orginalname}
-              onChange={(e) => setUserDetails({ ...userDetails, orginalname: e.target.value })}
-              className="w-full p-4 bg-white/5 rounded-xl"
-            />
+                {/* Stats */}
+                <div className="mt-8">
+                  <h3 className="text-lg font-bold text-white mb-4 text-center">Gaming Network</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Link to={`/following/${userId}`}>
+                      <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-xl p-5 border border-pink-500/30 hover:border-pink-400/50 transition-all duration-300 hover:scale-[1.02] cursor-pointer">
+                        <div className="text-3xl font-bold text-pink-400 text-center">{followersCount}</div>
+                        <div className="text-gray-300 text-center text-sm mt-2">Followers</div>
+                        <div className="text-gray-500 text-xs text-center mt-1">View all</div>
+                      </div>
+                    </Link>
 
-            <textarea
-              rows="4"
-              placeholder="Gaming Bio"
-              value={userDetails.bio}
-              onChange={(e) => setUserDetails({ ...userDetails, bio: e.target.value })}
-              className="w-full p-4 bg-white/5 rounded-xl"
-            />
+                    <Link to={`/following/${userId}`}>
+                      <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-xl p-5 border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300 hover:scale-[1.02] cursor-pointer">
+                        <div className="text-3xl font-bold text-blue-400 text-center">{followingCount}</div>
+                        <div className="text-gray-300 text-center text-sm mt-2">Following</div>
+                        <div className="text-gray-500 text-xs text-center mt-1">View all</div>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <div className="flex gap-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="flex-1 py-3 bg-white/10 rounded-xl"
-              >
-                Cancel
-              </button>
+            {/* Right Column - Edit Form */}
+            <div className="lg:col-span-2">
+              <div className="bg-gradient-to-br from-gray-900/90 to-gray-900/90 backdrop-blur-xl rounded-3xl border border-purple-500/30 p-8 shadow-2xl">
+                <div className="space-y-6">
+                  {/* Gamertag */}
+                  <div>
+                    <label className="block text-gray-300 text-sm font-medium mb-2">
+                      <span className="flex items-center gap-2">
+                        <span>🎮</span>
+                        Gamertag
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter your gaming username"
+                      value={userDetails.username}
+                      onChange={(e) => setUserDetails({ ...userDetails, username: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-800/60 backdrop-blur-sm border border-gray-700/50 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
 
-              <button
-                onClick={handleUpdateProfile}
-                className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl"
-              >
-                Update Profile
-              </button>
+                  {/* Display Name */}
+                  <div>
+                    <label className="block text-gray-300 text-sm font-medium mb-2">
+                      <span className="flex items-center gap-2">
+                        <span>👤</span>
+                        Display Name
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter your display name"
+                      value={userDetails.orginalname}
+                      onChange={(e) => setUserDetails({ ...userDetails, orginalname: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-800/60 backdrop-blur-sm border border-gray-700/50 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  {/* Gaming Bio */}
+                  <div>
+                    <label className="block text-gray-300 text-sm font-medium mb-2">
+                      <span className="flex items-center gap-2">
+                        <span>📝</span>
+                        Gaming Bio
+                      </span>
+                    </label>
+                    <textarea
+                      rows="4"
+                      placeholder="Tell us about your gaming journey, favorite games, or achievements..."
+                      value={userDetails.bio}
+                      onChange={(e) => setUserDetails({ ...userDetails, bio: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-800/60 backdrop-blur-sm border border-gray-700/50 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                    />
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-4 pt-6">
+                    <button
+                      onClick={() => navigate(-1)}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-2xl text-gray-300 hover:text-white hover:bg-gray-700/80 transition-all duration-300 border border-gray-700/50 hover:border-gray-600/70"
+                    >
+                      <span>←</span>
+                      Cancel
+                    </button>
+
+                    <button
+                      onClick={handleUpdateProfile}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl text-white font-bold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-lg shadow-purple-500/30"
+                    >
+                      <span>💾</span>
+                      Update Profile
+                    </button>
+                  </div>
+
+                  {/* Note */}
+                  <div className="mt-6 pt-6 border-t border-gray-700/50">
+                    <p className="text-gray-500 text-sm text-center">
+                      Your profile will be visible to other players in the gaming community
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

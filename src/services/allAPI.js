@@ -190,7 +190,91 @@ export const followUserAPI = async (userId) => {
 
   return response.data;
 };
+//chat received
+export const getMessagesAPI = async (receiverId) => {
+  const token = sessionStorage.getItem("token");  // sessionStorage
 
+  const res = await axios.get(`${SERVERURL}/chat/${receiverId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (res.data.success) {
+    return res.data.messages;
+  } else {
+    throw new Error("Failed to fetch messages");
+  }
+};
+
+// send message api
+export const sendMessageAPI = async (receiverId, message) => {
+  const token = sessionStorage.getItem("token");  // sessionStorage
+
+  const res = await axios.post(
+    `${SERVERURL}/chat/send`,
+    { receiverId, message },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.data.success) {
+    return res.data.message;
+  } else {
+    throw new Error("Failed to send message");
+  }
+};
+// Mark a single notification as read
+const markAsRead = async (id) => {
+  try {
+    const token = sessionStorage.getItem("token");
+    await axios.post(
+      `${SERVERURL}/notifications/mark-read/${id}`,
+      {}, // no body needed
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // Update UI state locally
+    setNotifications((prev) =>
+      prev.map((n) => (n._id === id ? { ...n, read: true } : n))
+    );
+  } catch (err) {
+    console.error("Failed to mark as read", err);
+  }
+};
+
+// Mark all notifications as read
+const markAllAsRead = async () => {
+  try {
+    const token = sessionStorage.getItem("token");
+    await axios.post(
+      `${SERVERURL}/notifications/mark-all-read`,
+      {}, // no body needed
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // Update UI state locally
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  } catch (err) {
+    console.error("Failed to mark all as read", err);
+  }
+};
+//delete user post by user
+export const deleteuserPostAPI = async (postId) => {
+  const token = sessionStorage.getItem("token");
+
+  const res = await axios.delete(
+    `${SERVERURL}/user/delete-post/${postId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+
+  return res.data;
+};
 
 
 

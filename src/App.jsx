@@ -39,6 +39,7 @@ import AdminProfileEdit from "./components/adminpage/AdminProfileEdit";
 import AdminFeedback from "./components/adminpage/AdminFeedback";
 import FollowersFollowing from "./pages/user/FollowersFollowing";
 import Followers from "./pages/user/Followers";
+import Chat from "./pages/user/Userhomepage/Chat";
 
 
 
@@ -60,15 +61,17 @@ function App() {
         <Route path="/admin-content" element={<ContentModeration />} />
         <Route path="/admin-profile-edit" element={<AdminProfileEdit />} />
         <Route path="/admin-feedback" element={<AdminFeedback />} />
+        <Route path="/chat/:userId" element={<Chat />} />
 
         {/* User */}
+        <Route path="/chat" element={<Chat />} />
         <Route path="/home" element={<Home />} />
         <Route path="/userhome" element={<UserHome />} />
         <Route path="/user-profile" element={<ProfileEdit />} />
         <Route path="/myfeed" element={<MyFeed />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/friends" element={<Friends />} />
- <Route path="/followers/:userId" element={<Followers />} />
+        <Route path="/followers/:userId" element={<Followers />} />
         <Route path="/following/:userId" element={<FollowersFollowing />} />
         <Route path="/userfeed/:userId" element={<UserFeed />} />
         <Route path="/create-post" element={<CreatePost />} />
