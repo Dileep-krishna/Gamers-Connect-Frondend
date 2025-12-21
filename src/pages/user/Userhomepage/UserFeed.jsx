@@ -165,7 +165,7 @@ const UserFeed = () => {
       ) : userProfile ? (
         <div className="bg-gray-800 rounded-xl p-6 mb-8 flex justify-center items-center gap-10 max-w-xl mx-auto flex-wrap">
           <button
-            onClick={() => navigate(`/followers/${userId}`)}
+            onClick={() => navigate(`/following/${userId}`)}
             className="text-center focus:outline-none mb-4"
           >
             <div className="text-3xl font-bold text-pink-400 cursor-pointer hover:text-pink-500">
