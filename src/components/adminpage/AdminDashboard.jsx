@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import AdminUserManagement from "./AdminUserManagement";
 import ContentModeration from "./ContentModeration";
-import GroupManagement from "./GroupManagement";
+
 import AdminProfileEdit from "./AdminProfileEdit";
 
 import SERVERURL from "../../services/serverURL";
@@ -177,8 +177,7 @@ const AdminDashboard = () => {
       case "content":
         return <ContentModeration />;
 
-      case "groups":
-        return <GroupManagement />;
+
 
       case "profile-edit":
         return <AdminProfileEdit adminDetails={adminDetails} setAdminDetails={setAdminDetails} />;
@@ -312,7 +311,7 @@ const AdminDashboard = () => {
             { id: "overview", label: "📊 Overview" },
             { id: "users", label: "👥 Users" },
             { id: "content", label: "📝 Content" },
-            { id: "groups", label: "👪 Groups" },
+         
             { id: "feedback", label: "💬 Feedback" },
             { id: "profile-edit", label: "⚙️ Profile" },
           ].map(({ id, label }) => (
